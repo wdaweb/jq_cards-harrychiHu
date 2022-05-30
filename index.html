@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .card {
+        width: 300px;
+        height: 340px;
+        position: relative;
+        float: left;
+        margin: 10px;
+        /* 設定子元素在 3D 空間內 */
+        transform-style: preserve-3d;
+        transition: transform 1s;
+      }
+
+      .question-card-front {
+        width: 100%;
+        height: 100%;
+        background-image: url('./img/1C.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        position: absolute;
+        transform: rotateY(180deg);
+        /* 翻過來後隱藏另一面 */
+        backface-visibility: hidden;
+      }
+
+      .question-card-back {
+        width: 100%;
+        height: 100%;
+        background-image: url('./img/card_back_people.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        position: absolute;
+        backface-visibility: hidden;
+      }
+
+      .answer-card-front {
+        width: 100%;
+        height: 100%;
+        background-image: url('./img/1D.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        position: absolute;
+        transform: rotateY(180deg);
+        /* 翻過來後隱藏另一面 */
+        backface-visibility: hidden;
+      }
+
+      .answer-card-back {
+        width: 100%;
+        height: 100%;
+        background-image: url('./img/card_back_home.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        position: absolute;
+        backface-visibility: hidden;
+      }
+
+      .card-open {
+        transform: rotateY(180deg);
+      }
+
+      #question,
+      #answer {
+        background-color: rgba(57, 67, 85, 0.6);
+        backdrop-filter: blur(10px);
+        filter: drop-shadow(5px 5px 5px rgba(55, 55, 55, 0.8));
+      }
+
+      #question {
+        width: 90%;
+        height: 80%;
+
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      #answer {
+        width: 90%;
+        height: 80%;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      #game {
+        max-width: 100vw;
+        max-height: 250vh;
+        background: url('./img/photo-1565788007968-8572e13e1f09.png') no-repeat
+          center center/cover;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      #btn-start {
+        border: none;
+        width: 20rem;
+        transition: 1s;
+      }
+      #btn-start:hover {
+        width: 22rem;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="game">
+      <div>
+        <input
+          type="image"
+          src="./img/btn_nor.png"
+          onmouseover="src='./img/btn_hover.png'"
+          onmousedown="src='./img/btn_fouse.png'"
+          onmouseout="src='./img/btn_nor.png'"
+          id="btn-start"
+        />
+      </div>
+      <div id="question"></div>
+      <div id="answer"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+      integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      //上面卡片
+
+      for (let i = 0; i < 13; i++) {
+        $('#question').append(`
+        <div class="card q-card">
+          <div class="question-card-front"></div>
+          <div class="question-card-back "></div>
+        </div>`)
+      }
+
+      //下面卡片
+      for (let i = 0; i < 13; i++) {
+        $('#answer').append(`
+        <div class="card a-card">
+        <div class="answer-card-front"></div>
+        <div class="answer-card-back "></div>
+      </div>`)
+      }
+
+      //確定 data-* (上排)
+      for (let i = 0; i < 13; i++) {
+        const num = (i % 13) + 1
+        // console.log(num)
+        $('.q-card')
+          .eq(i)
+          .find('.question-card-front')
+          .css('background-image', `url(./img/${num}C.png)`)
+        $('.q-card').eq(i).attr('data-card', num)
+        //製造一個新的順序(亂數)，並把原本正常的順序擺進去
+        const newOrder = Math.round(Math.random() * 12)
+        $('.q-card').eq(newOrder).insertAfter($('.q-card').eq(i))
+      }
+
+      //確定 data-* (下排)
+      for (let i = 0; i < 13; i++) {
+        const num = (i % 13) + 1
+        // console.log(num)
+        $('.a-card')
+          .eq(i)
+          .find('.answer-card-front')
+          .css('background-image', `url(./img/${num}D.png)`)
+        $('.a-card').eq(i).attr('data-card', num)
+        //製造一個新的順序(亂數)，並把原本正常的順序擺進去
+        const newOrder = Math.round(Math.random() * 12)
+        $('.a-card').eq(newOrder).insertAfter($('.a-card').eq(i))
+      }
+
+      // 開始
+      $('#btn-start').click(function () {
+        $(this).hide()
+        // 還原初始設定
+        $('.card').removeClass('.card-open')
+        $('.card').removeClass('card-ok')
+        $('.card').css('opacity', 1)
+        $('.question-card-front').css({
+          width: '100%',
+          height: '100%',
+          opacity: 1,
+        })
+        $('.answer-card-front').css({
+          width: '100%',
+          height: '100%',
+          opacity: 1,
+        })
+
+        $('#game').on('click', '.card', function () {
+          // 最多一次翻兩張，且這張牌還沒翻開
+          if ($('.card-open').length < 2 && !$(this).hasClass('card-open')) {
+            $(this).addClass('card-open')
+          }
+          // 如果翻開兩張了
+          if ($('.card-open').length === 2) {
+            // 如果數字一樣
+            if (
+              $('.card-open').eq(0).attr('data-card') ===
+              $('.card-open').eq(1).attr('data-card')
+            ) {
+              // 用 class 標記已完成
+              $('.card-open').addClass('card-ok')
+              // 將 .card-front 淡出，如果對 .card-open 淡出會把 3D 壓平只看到卡背
+              // 放大消失只能同時設定，不能接在後面設定
+              $('.card-open .question-card-front').animate(
+                { width: '+=30%', height: '+=30%', opacity: 0 },
+                2000,
+              )
+              $('.card-open .answer-card-front').animate(
+                { width: '+=30%', height: '+=30%', opacity: 0 },
+                2000,
+              )
+            }
+
+            // 不管是否一樣都將卡片翻回
+            setTimeout(function () {
+              // 如果 .card-open 裡的 .card-front 透明度不是 1，把 .card-open 透明度設為 0
+              $('.card-open').each(function () {
+                if (
+                  $(this).find('.question-card-front').css('opacity') !== '1' &&
+                  $(this).find('.answer-card-front').css('opacity') !== '1'
+                ) {
+                  $(this).css('opacity', 0)
+                }
+              })
+              $('.card-open').removeClass('card-open')
+              if ($('.card-ok').length === 26) {
+                $('#btn-start').show()
+                swal.fire({
+                  title: '恭喜過關',
+                })
+              }
+            }, 1000)
+          }
+        })
+      })
+    </script>
+  </body>
+</html>
